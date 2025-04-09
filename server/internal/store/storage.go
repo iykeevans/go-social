@@ -10,8 +10,8 @@ import (
 var (
 	ErrNotFound          = errors.New("resource not found")
 	ErrConflict          = errors.New("resource already exists")
-	ErrDuplicateEmail    = errors.New("Duplicate email")
-	ErrDuplicateUsername = errors.New("Duplicate username")
+	ErrDuplicateEmail    = errors.New("duplicate email")
+	ErrDuplicateUsername = errors.New("duplicate username")
 	QueryTimeoutDuration = time.Second * 5
 )
 
@@ -29,6 +29,7 @@ type Storage struct {
 		CreateAndInvite(ctx context.Context, user *User, token string, invitationExp time.Duration) error
 		Activate(context.Context, string) error
 		Delete(context.Context, int64) error
+		GetByEmail(context.Context, string) (*User, error)
 	}
 	Comments interface {
 		GetByPostID(context.Context, int64) ([]Comment, error)
