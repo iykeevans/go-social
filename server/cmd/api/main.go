@@ -1,6 +1,8 @@
 package main
 
 import (
+	"expvar"
+	"runtime"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -8,6 +10,7 @@ import (
 	"github.com/iykeevans/go-social/server/internal/db"
 	"github.com/iykeevans/go-social/server/internal/env"
 	"github.com/iykeevans/go-social/server/internal/mailer"
+	"github.com/iykeevans/go-social/server/internal/ratelimiter"
 	"github.com/iykeevans/go-social/server/internal/store"
 	"github.com/iykeevans/go-social/server/internal/store/cache"
 	"go.uber.org/zap"
@@ -72,6 +75,11 @@ func main() {
 				iss:    "go-social",
 			},
 		},
+		rateLimiter: ratelimiter.Config{
+			RequestsPerTimeFrame: env.GetInt("RATELIMITER_REQUESTS_COUNT", 20),
+			TimeFrame:            time.Second * 5,
+			Enabled:              env.GetBool("RATE_LIMITER_ENABLED", true),
+		},
 	}
 
 	// logger
@@ -100,6 +108,9 @@ func main() {
 		logger.Info("database connection to redis established")
 	}
 
+	// Rate Limiter
+	rateLimiter := ratelimiter.NewFixedWindowLimiter(cfg.rateLimiter.RequestsPerTimeFrame, cfg.rateLimiter.TimeFrame)
+
 	store := store.NewStorage(db)
 	cacheStorage := cache.NewRedisStorage(rdb)
 
@@ -120,7 +131,17 @@ func main() {
 		logger:        logger,
 		mailer:        mailtrap,
 		authenticator: jwtAuthenticator,
+		rateLimiter:   rateLimiter,
 	}
+
+	// Metrics collected
+	expvar.NewString("version").Set(version)
+	expvar.Publish("database", expvar.Func(func() any {
+		return db.Stats()
+	}))
+	expvar.Publish("goroutines", expvar.Func(func() any {
+		return runtime.NumGoroutine()
+	}))
 
 	mux := app.mount()
 
