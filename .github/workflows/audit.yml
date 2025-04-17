@@ -17,20 +17,33 @@ jobs:
         with:
           go-version: 1.22
 
-      - name: Verify Depedencies
+      - name: Verify Dependencies
+        working-directory: server
         run: go mod verify
 
       - name: Build
+        working-directory: server
         run: go build -v ./...
 
       - name: Run go vet
+        working-directory: server
         run: go vet ./...
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
       - name: Install staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
       - name: Run staticcheck
+        working-directory: server
         run: staticcheck ./...
 
       - name: Run Tests
+        working-directory: server
         run: go test -race ./...
