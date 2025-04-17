@@ -27,7 +27,7 @@ jobs:
   test-go:
     # Install go modules and run tests
     docker:
-      - image: cimg/go:1.22
+      - image: cimg/go:1.23
     working_directory: ~/project/server
     steps:
       - checkout:
@@ -53,7 +53,7 @@ jobs:
   build-go-executables:
     # Build go executables and store them as artifacts
     docker:
-      - image: cimg/go:1.20
+      - image: cimg/go:1.23
     working_directory: ~/project/server
     steps:
       - checkout:
