@@ -54,6 +54,7 @@ jobs:
     # Build go executables and store them as artifacts
     docker:
       - image: cimg/go:1.20
+    working_directory: ~/project/web
     steps:
       - checkout:
           path: ~/project
@@ -87,10 +88,10 @@ jobs:
       # Replace this with steps to deploy to users
       - run:
           name: deploy
-          command: '#e.g. ./deploy.sh'
+          command: "#e.g. ./deploy.sh"
       - run:
           name: found github actions config
-          command: ':'
+          command: ":"
 workflows:
   build-and-test:
     jobs:
