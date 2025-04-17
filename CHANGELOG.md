@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/iykeevans/go-social/compare/v1.0.0...v1.1.0) (2025-04-17)
+
+
+### Features
+
+* disable redis ([7ef20b7](https://github.com/iykeevans/go-social/commit/7ef20b7c94110c390bdd586ecb6a2c6e2e914a9d))
+
 ## 1.0.0 (2025-04-17)
 
 
